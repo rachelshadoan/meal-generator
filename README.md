@@ -3,7 +3,7 @@ A simple meal idea generator for people who know how to cook but don't know what
 
 ## Requirements
 
-(Git)[https://git-scm.com/] and (Python3)[https://www.python.org/download/releases/3.0/]
+[Git](https://git-scm.com/) and [Python3](https://www.python.org/download/releases/3.0/)
 
 ## How To Use
 
