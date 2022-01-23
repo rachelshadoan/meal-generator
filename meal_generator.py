@@ -143,9 +143,12 @@ def main():
     larder = load_larder()
 
     for spec in recipe_specs:
+        try:
+            recipe = larder.generate_food_combination(spec)
+            print(f"{recipe}")
+        except Exception:
+            continue
 
-        recipe = larder.generate_food_combination(spec)
-        print(f"{recipe}") 
 
                 
     
