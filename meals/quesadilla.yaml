@@ -1,0 +1,18 @@
+name: Quesadilla
+implicitly_named_ingredients:
+  - tortillas
+choices:
+  - ChooseOne:
+      name: tortillas
+  - ChooseSome:
+      category: protein
+      min: 0
+      max: 2
+  - ChooseSome:
+      category: veg
+      min: 1
+      max: 2
+  - ChooseSome:
+      category: cheese
+      min: 1
+      max: 4 

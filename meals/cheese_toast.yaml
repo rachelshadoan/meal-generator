@@ -1,6 +1,19 @@
-fixed:
-  cheese:
-    type: protein
-  bread:
-    type: carb
-constraints: 
+name: Cheese Toast
+implicitly_named_ingredients:
+  - cheese
+  - bread
+choices:
+  - ChooseOne:
+      name: bread
+  - ChooseSome:
+      category: cheese
+      min: 1
+      max: 1
+  - ChooseSome:
+      category: veg
+      min: 0
+      max: 3
+  - ChooseSome:
+      category: protein
+      min: 0
+      max: 1 

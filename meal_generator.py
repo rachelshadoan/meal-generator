@@ -7,11 +7,37 @@ import collections
 from dataclasses import dataclass, field
 from typing import List
 from typing import Dict
+from os import listdir
+from os.path import isfile, join
 
-@dataclass
+@dataclass(frozen=True)
 class Ingredient:
     category: str
     name: str
+
+def stem(food_name):
+    if food_name.endswith("es"):
+        return food_name[:-2]
+    if food_name.endswith("s"):
+        return food_name[:-1]
+
+    return food_name
+
+def capitalize(food_name):
+    name_parts = []
+    for name_part in food_name.split(" "):
+        name_parts.append(name_part.capitalize())
+    
+    return  " ".join(name_parts)
+
+def pretty_print_recipe(food_bag, recipe_conf):
+
+    food_kinds = sorted([ capitalize(stem(food.name)) for food in food_bag if food.name not in recipe_conf["implicitly_named_ingredients"]])
+    recipe_name = (" ".join(food_kinds) + " " + recipe_conf["name"]).replace("Canned ", "")
+
+    full_recipe = recipe_name + "\n\t-" + "\n\t-".join([food.name for food in food_bag])
+
+    return full_recipe
 
 @dataclass
 class Larder:
@@ -44,15 +70,13 @@ class Larder:
         raise Larder.CategoryNotFoundException(category)
     
     def generate_food_combination(self, recipe_conf):
-        food_bag = []
+        food_bag = set()
 
         for choice in recipe_conf["choices"]:
-            food_bag += choice.choose(self)
+            for ingredient in choice.choose(self):
+                food_bag.add(ingredient)
 
-        food_kinds = sorted([ food.name for food in food_bag if food.name not in recipe_conf["implicitly_named_ingredients"]])
-        recipe_name = " ".join(food_kinds) + " " + recipe_conf["name"]
-
-        return recipe_name
+        return pretty_print_recipe(food_bag, recipe_conf)
 
 
 @dataclass
@@ -74,7 +98,8 @@ class ChooseSome:
 
     def choose(self, larder):
         ingredients_in_category = larder.get_by_category(self.category)
-        return [ random.choice(ingredients_in_category) for i in range(self.min, self.max) ]
+        top_range = random.randint(self.min, self.max)
+        return [ random.choice(ingredients_in_category) for i in range(0, top_range) ]
 
 def init_class(class_conf):
     class_type = next(iter(class_conf))
@@ -100,15 +125,30 @@ def load_larder():
     return Larder(ingredients)
 
 def main():
-    path = "meals/fried_rice.yaml"
+
+    recipe_specs = []
+    recipe_dir = "meals/"
+    recipe_paths = []
+
+    for f in listdir(recipe_dir):
+        file_path = join(recipe_dir, f)
+        if(isfile(file_path)):
+            recipe_paths.append(file_path)
+
+    random.shuffle(recipe_paths)
+
+    for path in recipe_paths:
+        recipe_specs.append(load_recipe_spec(path))
 
     larder = load_larder()
 
-    recipe_spec = load_recipe_spec(path)
+    for spec in recipe_specs:
 
-    recipe_name = larder.generate_food_combination(recipe_spec)
+        recipe = larder.generate_food_combination(spec)
+        print(f"{recipe}") 
+
+                
     
-    print(f"{recipe_name=}")
 
 if __name__ == "__main__":
     main()

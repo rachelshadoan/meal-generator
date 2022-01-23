@@ -15,7 +15,7 @@ ingredients:
     category: cheese
   chevre:
     category: cheese
-  smoked hock:
+  smoked ham hock:
     category: protein
   cauliflower:
     category: veg
@@ -44,4 +44,24 @@ ingredients:
   carrots:
     category: veg
   celery:
+    category: veg
+  mozzarella:
+    category: cheese
+  refried beans:
+    category: protein
+  tofu:
+    category: protein
+  eggs:
+    category: protein
+  bread:
+    category: carbs
+  tortillas:
+    category: carbs
+  edamame:
+    category: veg
+  mizuna:
+    category: veg
+  kale:
+    category: veg
+  broccoli:
     category: veg

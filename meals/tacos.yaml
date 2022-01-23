@@ -1,11 +1,18 @@
-fixed:
-  tortillas:
-    type: carb
-constraints:
-  and:
-    - has_ingredient:
-        type: protein
-        limit: 2
-    - has_ingredient:
-        type: veg
-        limit: 3
+name: Tacos
+implicitly_named_ingredients:
+  - tortillas
+choices:
+  - ChooseOne:
+      name: tortillas
+  - ChooseSome:
+      category: protein
+      min: 1
+      max: 2
+  - ChooseSome:
+      category: veg
+      min: 1
+      max: 2
+  - ChooseSome:
+      category: cheese
+      min: 0
+      max: 1      
