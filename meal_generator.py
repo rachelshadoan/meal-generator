@@ -1,103 +1,114 @@
+from ast import Dict
 from unicodedata import category
 import yaml
 import sys
 import random
-from dataclasses import dataclass
+import collections
+from dataclasses import dataclass, field
 from typing import List
+from typing import Dict
 
 @dataclass
 class Ingredient:
     category: str
-    kind: str
+    name: str
 
 @dataclass
-class IngredientSpec:
-    category: str
-    kind: str = None
-    limit: int = 1
+class Larder:
+    categories: Dict = field(init=False)
+    ingredients: Dict
 
-    def matches(self, recipe):
-        for ingredient in recipe:
-            if self.matches_ingredient(ingredient):
-                return True
+    class FoodNotFoundException(Exception):
+        pass
 
-        return False
-
-    def matches_ingredient(self, ingredient):
-        if self.category != ingredient.category:
-            return False
-        elif self.kind and ingredient.kind != self.kind:
-            return False
-        else:
-            return True
-
-
-@dataclass
-class CompoundSpec:
-    ingredient_specs: List
-    operator: str
+    class CategoryNotFoundException(Exception):
+        pass
 
     def __post_init__(self):
-        rehydrated_ingredients = []
-        for conf in self.ingredient_specs:
-            rehydrated_ingredients.append(make_constraint(conf))
-        self.ingredient_specs = rehydrated_ingredients
-        operator_function = getattr(sys.modules["builtins"], self.operator)
-        self.operator = operator_function
+        self.categories = {}
 
-    def matches(self, recipe):
-        subclause_values = [ spec.matches(recipe) for spec in self.ingredient_specs ]
-        return self.operator(subclause_values)
+        for name in self.ingredients:
+            ingredient = self.ingredients[name]
+            if ingredient.category not in self.categories:
+                self.categories[ingredient.category] = []
+            self.categories[ingredient.category].append(ingredient)
 
-def make_constraint(constraint_conf):
-    constraint_type = next(iter(constraint_conf))
-    constraint_parameters = constraint_conf[constraint_type]
-    constraint_class = getattr(sys.modules[__name__], constraint_type)
-    return constraint_class(**constraint_parameters)
+    def get_by_name(self, name):
+        if name in self.ingredients:
+            return self.ingredients[name]
+        raise Larder.FoodNotFoundException(name)
+
+    def get_by_category(self, category):
+        if category in self.categories:
+            return self.categories[category]
+        raise Larder.CategoryNotFoundException(category)
+    
+    def generate_food_combination(self, recipe_conf):
+        food_bag = []
+
+        for choice in recipe_conf["choices"]:
+            food_bag += choice.choose(self)
+
+        food_kinds = sorted([ food.name for food in food_bag if food.name not in recipe_conf["implicitly_named_ingredients"]])
+        recipe_name = " ".join(food_kinds) + " " + recipe_conf["name"]
+
+        return recipe_name
+
+
+@dataclass
+class ChooseOne:
+    name: str
+
+    def choose(self, larder):
+        return [larder.get_by_name(self.name)]
+
+@dataclass
+class ChooseSome:
+    category: str
+    min: int
+    max: int
+
+    def __post_init__(self):
+        self.min = int(self.min)
+        self.max = int(self.max)
+
+    def choose(self, larder):
+        ingredients_in_category = larder.get_by_category(self.category)
+        return [ random.choice(ingredients_in_category) for i in range(self.min, self.max) ]
+
+def init_class(class_conf):
+    class_type = next(iter(class_conf))
+    class_params = class_conf[class_type]
+    class_class = getattr(sys.modules[__name__], class_type)
+    return class_class(**class_params)
 
 def load_recipe_spec(path):
     with open(path, "r") as recipe_file:
         recipe_conf = yaml.load(recipe_file, Loader=yaml.BaseLoader)
-        recipe_conf["schema"] = make_constraint(recipe_conf["schema"])
+        recipe_conf["choices"] = [ init_class(conf) for conf in recipe_conf["choices"] ]
         return recipe_conf
-        
-
-def generate_recipe(recipe_conf, max_attempts=100):
-    ingredients_list = get_ingredient_options()
-
-    for attempt in range(max_attempts):
-        fridge = ingredients_list.copy()
-        random.shuffle(fridge)
-        food_bag = []
-        while fridge:
-            food_bag.append(fridge.pop())
-            if recipe_conf["schema"].matches(food_bag):
-                food_kinds = sorted([ food.kind for food in food_bag if food.kind not in recipe_conf["implicitly_named_ingredients"]])
-                recipe_name = " ".join(food_kinds) + " " + recipe_conf["name"]
-                return recipe_name
-    return None
-
-
-
-def get_ingredient_options():
-    ingredient_options = []
-
+ 
+def load_larder():
+    ingredients = {}
     with open("ingredients.yaml", "r") as ingredients_file:
-        ingredients_list = yaml.load(ingredients_file, Loader=yaml.BaseLoader)["ingredients"]
-        for i in ingredients_list:
-            ingredient_options.append(Ingredient(**i))
-            
-    return ingredient_options
+        ingredients_dict = yaml.load(ingredients_file, Loader=yaml.BaseLoader)["ingredients"]
+        for name in ingredients_dict:
+            i = ingredients_dict[name]
+            i["name"] = name
+            ingredients[name] = Ingredient(**i)
+
+    return Larder(ingredients)
 
 def main():
     path = "meals/fried_rice.yaml"
 
-    get_ingredient_options()
+    larder = load_larder()
+
     recipe_spec = load_recipe_spec(path)
 
-    recipe = generate_recipe(recipe_spec)
-
-    print(f"{recipe=}")
+    recipe_name = larder.generate_food_combination(recipe_spec)
+    
+    print(f"{recipe_name=}")
 
 if __name__ == "__main__":
     main()
