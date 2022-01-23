@@ -82,23 +82,17 @@ def generate_recipe(recipe_conf, max_attempts=100):
 def get_ingredient_options():
     ingredient_options = []
 
-    ingredient_options.append(Ingredient("veg", "pickles"))
-    ingredient_options.append(Ingredient("protein", "ice cream"))
-    ingredient_options.append(Ingredient("carb", "rice"))
-    ingredient_options.append(Ingredient("carb", "bread"))
-    ingredient_options.append(Ingredient("protein", "bacon"))
-    ingredient_options.append(Ingredient("veg", "bok choi"))
-    ingredient_options.append(Ingredient("veg", "scallions"))
-    ingredient_options.append(Ingredient("protein", "cheddar cheese"))
-    ingredient_options.append(Ingredient("protein", "egg"))
-    ingredient_options.append(Ingredient("protein", "milk"))
-    ingredient_options.append(Ingredient("carb", "elbow macaroni"))
-    ingredient_options.append(Ingredient("carb", "yellow potatos"))
-
+    with open("ingredients.yaml", "r") as ingredients_file:
+        ingredients_list = yaml.load(ingredients_file, Loader=yaml.BaseLoader)["ingredients"]
+        for i in ingredients_list:
+            ingredient_options.append(Ingredient(**i))
+            
     return ingredient_options
 
 def main():
     path = "meals/fried_rice.yaml"
+
+    get_ingredient_options()
     recipe_spec = load_recipe_spec(path)
 
     recipe = generate_recipe(recipe_spec)

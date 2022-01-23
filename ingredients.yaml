@@ -1,0 +1,41 @@
+ingredients:
+  - kind: milk
+    category: liquid
+  - kind: rice
+    category: carb
+  - kind: potatoes
+    category: carb
+  - kind: impossible sausage
+    category: protein
+  - kind: cheddar cheese
+    category: protein
+  - kind: smoked hock
+    category: protein
+  - kind: cauliflower
+    category: veg
+  - kind: scallions
+    category: veg
+  - kind: spinach
+    category: veg
+  - kind: canned tomatoes
+    category: veg
+  - kind: canned peaches
+    category: fruit
+  - kind: canned corn
+    category: veg
+  - kind: sweet potatoes
+    category: carb
+  - kind: bacon
+    category: protein
+  - kind: ramen noodles
+    category: carb
+  - kind: chickpea spaghetti
+    category: carb
+  - kind: chickpeas
+    category: protein
+  - kind: corona beans
+    category: protein
+  - kind: carrots
+    category: veg
+  - kind: celery
+    category: veg
