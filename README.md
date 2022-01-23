@@ -9,7 +9,9 @@ A simple meal idea generator for people who know how to cook but don't know what
 
 To use this generator, first clone the repo with the command
 
-```git clone git@github.com:rachelshadoan/meal-generator.git```
+```
+git clone git@github.com:rachelshadoan/meal-generator.git
+```
 
 Edit `ingredients.yaml` to reflect what is in your fridge and pantry. An ingredient entry is formatted like:
 ```
@@ -35,7 +37,9 @@ If none of the recipes specifications in the `meals` directory call for an ingre
 
 Once you have `ingredients.yaml` reflecting what's available in your house, run the generator from your terminal with the command:
 
-```python3 meal_generator.py```
+```
+python3 meal_generator.py
+```
 
 That will produce a list of meal ideas from the meals defined in the `meals` directory. Run it as many times as you like,
 you'll get different suggestions every time!
