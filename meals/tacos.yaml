@@ -1,0 +1,11 @@
+fixed:
+  tortillas:
+    type: carb
+constraints:
+  and:
+    - has_ingredient:
+        type: protein
+        limit: 2
+    - has_ingredient:
+        type: veg
+        limit: 3

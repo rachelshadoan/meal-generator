@@ -1,0 +1,6 @@
+fixed:
+  cheese:
+    type: protein
+  bread:
+    type: carb
+constraints: 

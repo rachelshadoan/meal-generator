@@ -1,0 +1,19 @@
+name: Fried Rice
+implicitly_named_ingredients:
+  - rice
+schema:
+  CompoundSpec:
+    operator: all
+    ingredient_specs:
+      - IngredientSpec:
+          category: carb
+          kind: rice
+      - CompoundSpec:
+          operator: any
+          ingredient_specs:
+          - IngredientSpec: 
+              category: protein
+              limit: 2
+          - IngredientSpec: 
+              category: veg
+              limit: 3
